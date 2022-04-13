@@ -5,6 +5,8 @@ const routerApi = require('./routes')
 const app = express();
 const port = 4000;
 
+app.use(express.json());
+
 routerApi(app);
 
 
@@ -17,5 +19,5 @@ app.get('/new-rute', (req, res)=>{
 });
 
 app.listen(port, ()=>{
-  console.log('Mi port' , port);
+  console.log('Your port is:' , port);
 });
