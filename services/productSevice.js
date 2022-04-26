@@ -6,7 +6,7 @@ class ProductsServices{
     this.products = [];
     this.generate();
   }
-  generate(){
+  async generate(){
     const limit = 100;
     for (let index = 0; index < limit; index++) {
       this.products.push({
@@ -18,24 +18,35 @@ class ProductsServices{
     }
   }
 
-  create(data){
+  async create(product_name, price, image){
+    if(product_name || price || image === undefined){
+      throw new Error('There is something missing');
+    }
     const newProduct = {
       id: faker.datatype.uuid(),
-      ...data
+      ...product_name,
+      ...price,
+      ...image
     }
     this.products.push(newProduct);
     return newProduct;
   }
 
   find(id){
+    return new Promise((resolve, reject)=> {
+      setTimeout(()=>{
+        resolve(this.products);
+      }, 5000);
+    });
     return this.products;
   }
 
-  findOne(id){
+  async findOne(id){
+    const name = this.getTotal();
     return this.products.find(item => item.id === id)
   }
 
-  update(id, changes){
+  async update(id, changes){
     const index = this.products.findIndex(item => item.id === id);
     if (index === -1){
       throw new Error('product not found');
@@ -48,10 +59,10 @@ class ProductsServices{
     return this.products[index];
   }
 
-  delete(id){
+  async delete(id){
     const index = this.products.findIndex(item => item.id === id);
     if (index === -1){
-      throw new Error('product not found');
+      throw new Error('product not exist');
     }
     this.products.splice(index, 1);
     return { message: `El producto con id ${id} se elimino` }
