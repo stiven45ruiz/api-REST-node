@@ -15,6 +15,7 @@ class ProductsServices{
         name: faker.commerce.productName(),
         price: parseInt(faker.commerce.price(), 10),
         image: faker.image.imageUrl(),
+        isBlock: faker.datatype.boolean(),
       });
     }
   }
@@ -34,19 +35,21 @@ class ProductsServices{
   }
 
   find(id){
-    return new Promise((resolve, reject)=> {
+    return new Promise((resolve)=> {
       setTimeout(()=>{
         resolve(this.products);
       }, 5000);
     });
-    return this.products;
   }
 
   async findOne(id){
-    const name = this.getTotal();
+
     const product = this.products.find(item => item.id === id)
-    if (index === -1) {
+    if (!product) {
       throw boom.notFound('Product Not Found')
+    }
+    if(product.isBlock){
+      throw boom.conflict('Product is block')
     }
     return product;
   }
