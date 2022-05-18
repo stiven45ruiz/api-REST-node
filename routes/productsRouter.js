@@ -1,7 +1,12 @@
 const { response } = require("express");
 const express = require("express");
 const ProductsServices = require('./../services/productSevice')
-
+const validatorHandler = require('./../middlewares/validatorHandler')
+const {
+  createProductSchemas,
+  updateProductSchemas,
+  getProductSchemas
+} = require('./../schemas/productSchema')
 
 const router = express.Router();
 const service = new ProductsServices();
@@ -16,48 +21,46 @@ router.get('/filter', (req, res)=> {
   res.send('Yo soy un filter')
 })
 
-router.get('/:id', async (req, res, next) => {
-  try {
-    const { id } = req.params;
-  const product = await service.findOne(id);
-  if(!product){
-    res.status(404).json({
-      message: `El producto con id ${id} no existe`
-    });
-  } else {
-    res.status(200).json({
-      product
-    });
+router.get('/:id',
+  validatorHandler(getProductSchemas, 'paramas'),
+  async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const product = await service.findOne(id);
+      res.json(product);
+
+    } catch (error) {
+      next(error)
+    }
   }
-  } catch (error) {
-    next(error)
-  }
-});
+);
 
 
-router.post('/', async(req, res)=>{
-  try {
+router.post('/',
+  validatorHandler(createProductSchemas, 'body'),
+  async(req, res)=>{
+
     const body = req.body;
     const newProduct = await service.create(body);
-    res.status(201).json({newProduct
-  })
-  } catch (error) {
-    res.status(406).json({
-      message: error.message
-    });
-  }
-});
+    res.status(201).json({newProduct})
 
-router.patch('/:id', async (req, res, next)=>{
-  try {
-    const {id } = req.params;
-    const body = req.body;
-    const product = await service.update(id, body);
-    res.json(product)
-  } catch (error) {
-    next(error)
   }
-});
+);
+
+router.patch('/:id',
+  validatorHandler(getProductSchemas, 'params'),
+  validatorHandler(updateProductSchemas, 'body'),
+  async (req, res, next)=>{
+    try {
+      const {id } = req.params;
+      const body = req.body;
+      const product = await service.update(id, body);
+      res.json(product)
+    } catch (error) {
+      next(error)
+    }
+  }
+);
 
 router.put('/:id', (req, res)=>{
   const {id } = req.params;
