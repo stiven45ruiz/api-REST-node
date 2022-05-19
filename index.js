@@ -14,7 +14,7 @@ const whiteList = [
 ];
 const options = {
   origin: (origin, callback)=>{
-    if (whiteList.includes){
+    if (whiteList.includes(origin) || origin){
       callback(null, true)
     }else{
       callback(new Error('no permitido'))
